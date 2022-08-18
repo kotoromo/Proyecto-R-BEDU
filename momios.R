@@ -257,8 +257,14 @@ p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="purple") + geom_poi
 p
 
 
+# Calculamos la frecuencia de número de goles como local
+frecuencias <-  as.data.frame(table(scores$home.score)) 
+# Se gráfica esa frecuencia
+plot(frecuencias$Var1, frecuencias$Freq, type = "l", xlab="Número de goles", ylab="Frecuencia")
+# Se observa una distribución asimetrica por la derecha
+
 # Prueba de hipótesis 
-# Ho goles = 3    Hipótesis Nula el equipo anota 3 goles
+# H0 goles = 3    Hipótesis Nula el equipo anota 3 goles
 # H1 goles > 3    Hipótesis Alterna el equipo anota más de 3 goles
 scores_rm = filter(scores, home.team == "Real Madrid")
 # https://app.bedu.org/course/21434/module/202/session/1397/content/3675/part/5831
@@ -266,10 +272,9 @@ scores_rm = filter(scores, home.team == "Real Madrid")
 z0 <- (mean(scores_rm$home.score)-3)/(sd(scores_rm$home.score)/sqrt(nrow(scores_rm)))
 z.05 <- qnorm(p = 0.05, lower.tail = FALSE)
 pvalue <- pnorm(z0, lower.tail = FALSE)
-x <- scores$date
-y <- dnorm(x)
-plot(scores$date, scores$home.score, type = "l", xlab="", ylab="")
 
 z0
 z.05
 pvalue
+
+# Como z0 < z.05 se acepta H0
