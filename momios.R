@@ -2,10 +2,11 @@
 library(fbRanks)
 library(dplyr)
 library(ggplot2)
+library(data.table)
 
 ###################### Directorio de trabajo ###################################
 
-setwd("~/Documents/BEDU/FASE_2/Proyecto")                                       #Difiere dependiendo del usuario
+setwd("~/WorkingDirectory/Proyecto-R-BEDU/")                                       #Difiere dependiendo del usuario
 
 ####################### Descarga de archivos ###################################
 # https://www.football-data.co.uk/spainm.php
@@ -252,7 +253,7 @@ plot(frecuencias$Var1, frecuencias$Freq, type = "l", xlab="Número de goles", yl
 # Se observa una distribución asimetrica por la derecha
 # Entonces aplicaremos el teorema del límite central
 
-library(data.table)
+# library(data.table)
 # Generar 100 muestras de 40 registros
 muestras <- c()
 for(i in 1:100){
