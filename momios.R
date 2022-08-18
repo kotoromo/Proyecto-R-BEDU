@@ -255,3 +255,21 @@ p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="purple") + geom_poi
   theme(axis.text.x = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1),
         axis.text.y = element_text(face = "bold", color="blue" , size = 10, angle = 25, hjust = 1))  # color, ángulo y estilo de las abcisas y ordenadas 
 p
+
+
+# Prueba de hipótesis 
+# Ho goles = 3    Hipótesis Nula el equipo anota 3 goles
+# H1 goles > 3    Hipótesis Alterna el equipo anota más de 3 goles
+scores_rm = filter(scores, home.team == "Real Madrid")
+# https://app.bedu.org/course/21434/module/202/session/1397/content/3675/part/5831
+# Formula del (z0 <- (mean(muestra)-media_de_prueba)/(sd(muestra)/sqrt(tamaño_de_muestra)))
+z0 <- (mean(scores_rm$home.score)-3)/(sd(scores_rm$home.score)/sqrt(nrow(scores_rm)))
+z.05 <- qnorm(p = 0.05, lower.tail = FALSE)
+pvalue <- pnorm(z0, lower.tail = FALSE)
+x <- scores$date
+y <- dnorm(x)
+plot(scores$date, scores$home.score, type = "l", xlab="", ylab="")
+
+z0
+z.05
+pvalue
