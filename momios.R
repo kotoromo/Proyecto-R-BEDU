@@ -286,28 +286,27 @@ ggplot(data.frame(x = d$x, y = d$y),aes(x, y)) +                                
 
 ############################## Prueba de hipótesis #############################
 
-#Nos interesa saber si en promedio el numero de goles que anota el Real Madrid
-#cuando juega como local es mayor a 2
+m_scores_rm <- sample(scores_rm$home.score, 40)                                 #Extraemos un subconjunto de nuestra población
 
+# Nos interesa saber si en promedio el numero de goles que anota el Real Madrid
+# cuando juega como local es mayor a 2
+
+# Prueba de cola superior
 # H0 goles <= 2    Hipótesis Nula el equipo 2 o menos goles
 # H1 goles > 2    Hipótesis Alterna el equipo anota más de 2 goles
 
-prom <- mean(scores_rm$home.score)                                              # Promedio
-desv <- sd(scores_rm$home.score)                                                # Desviación estándar
-n <- length(scores_rm$home.score)                                               # Tamaño de muestra
+prom <- mean(m_scores_rm)                                                       # Promedio
+desv <- sd(m_scores_rm)                                                         # Desviación estándar
+n <- length(m_scores_rm)                                                        # Tamaño de muestra
 
 #(z0 <- (mean(muestra)-media_de_prueba)/(sd(muestra)/sqrt(tamaño_de_muestra)))  # Estadístico de prueba
 (z0 <- (prom-2)/(desv/sqrt(n)))
 
-(z.05 <- qnorm(p = 0.05,  lower.tail = FALSE))                                  # Valor critico para identificar zona de rechazo
+(z.05 <- qnorm(p = 0.05,  lower.tail = FALSE))                                  # Valor critico para identificar zona de rechazo a 95% de confianza
 
 (pvalue <- pnorm(z0, lower.tail = FALSE))                                       # Calculo de P value
 
-t.test(x=scores_rm$home.score, alternative = 'greater', mu=2)                   # Comprobamos con la prueba t test de forma directa
-
-# Como nuestro estadístico de prueba se encuentra en zona de rechazo,
-# existe evidencia estadística necesaria para rechazar la hipótesis nula.
-# Entonces se puede afirmar con una confianza del 95% que el Real Madrid anotará MÁS DE DOS GOLES jugando como local.
+t.test(x=m_scores_rm, alternative = 'greater', mu=2)                            # Comprobamos con la prueba t test de forma directa
 
 x <- seq(-4, 4, 0.1)
 y <- dnorm(x)
@@ -315,9 +314,17 @@ y <- dnorm(x)
 ggplot(data.frame(x,y),aes(x, y)) +                                             #Graficamos nuestra zona de rechazo
   stat_function(fun=dnorm, geom="line", col = "white")+
   geom_ribbon(data=subset(data.frame(x,y) ,x>=z.05 & x<4),aes(ymax=y),ymin=0,
-              fill="red", colour=NA, alpha=0.5)+
+              fill="brown3", colour=NA)+
   geom_text(label=round(z.05,5), x=z.05, y=0, color = "white")+
+  geom_label(label="Zona de rechazo", x=3.5, y=0.2, 
+            label.padding = unit(0.55, "lines"), fill = "brown3", alpha = 0.2)+
   labs(y = "Densidad",
        title = "Densidad normal estándar")+
   theme(plot.title = element_text(size=22)) +
   dark_theme_gray()
+
+# Como nuestro estadístico de prueba se encuentra en zona de rechazo,
+# existe evidencia estadística necesaria para rechazar la hipótesis nula.
+# Entonces se puede afirmar con una confianza del 95% que el Real Madrid anotará MÁS DE DOS GOLES jugando como local.
+
+
