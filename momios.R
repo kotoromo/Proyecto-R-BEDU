@@ -2,11 +2,11 @@
 library(fbRanks)
 library(dplyr)
 library(ggplot2)
-library(data.table)
+library(ggdark)
 
 ###################### Directorio de trabajo ###################################
 
-setwd("~/WorkingDirectory/Proyecto-R-BEDU/")                                       #Difiere dependiendo del usuario
+setwd("~/Documents/BEDU/FASE_2/Proyecto")                                       #Difiere dependiendo del usuario
 
 ####################### Descarga de archivos ###################################
 # https://www.football-data.co.uk/spainm.php
@@ -172,7 +172,6 @@ for(j in 1:length(phs)){                                                        
 
 
 ######################### Escenario con momios máximos #########################
-library(ggdark)
 
 g <- data.frame(Num_Ap = 1:length(g), Capital = g)                              #Crea un dataframe con la lista generada en el loop for                                           
 p <- ggplot(g, aes(x=Num_Ap, y=Capital)) + geom_line( color="deepskyblue4") +   #Crea un gráfico
@@ -234,78 +233,31 @@ png(filename="Dashboard/www/momios_prom.png", width = 900, height = 498)        
 p
 dev.off()
 
-################################################################################
-#
-#       Trabajo de Mateo comienza aquí
-#
-################################################################################
-
-# Prueba de hipótesis 
-# H0 goles = 3    Hipótesis Nula el equipo anota 3 goles
-# H1 goles > 3    Hipótesis Alterna el equipo anota más de 3 goles
-scores_rm = filter(scores, home.team == "Real Madrid")
-
-# Calculamos la frecuencia de número de goles como local
-frecuencias <-  as.data.frame(table(scores_rm$home.score))
-
-# Se gráfica esa frecuencia
-plot(frecuencias$Var1, frecuencias$Freq, type = "l", xlab="Número de goles", ylab="Frecuencia")
-# Se observa una distribución asimetrica por la derecha
-# Entonces aplicaremos el teorema del límite central
-
-# library(data.table)
-# Generar 100 muestras de 40 registros
-muestras <- c()
-for(i in 1:100){
-  tmp <- sample(scores_rm$home.score, size = 40)
-  tmp <- as.data.table(tmp)
-  tmp[, grupo := i] 
-  l <- list(muestras, tmp)
-  muestras <- rbindlist(l) 
-}
-
-# Objeto tipo tabla con la media de cada muestra
-medias <- muestras[, mean(tmp), by = grupo]
-setnames(medias, "V1", "promedio")
-promedio_muestras <- mean(medias$promedio)
-
-# Gráfica de la distribución de las medias de las muestras
-d <- density(medias$promedio, adjust = 1.8)
-plot(d, main = "Densidad de los goles como local")
-polygon(d, col="cadetblue1", border = "white")
-lines(d, col ="#000000", lwd = 3)
-
-#Con esto ya se aproxima a una distribución normal y podemos hacer una prueba de hipótesis
-# Siguiendo la explicación de https://app.bedu.org/course/21434/module/202/session/1397/content/3675/part/5831
-# Formula del (z0 <- (mean(muestra)-media_de_prueba)/(sd(muestra)/sqrt(tamaño_de_muestra)))
-#z0 <- (mean(scores_rm$home.score)-3)/(sd(scores_rm$home.score)/sqrt(nrow(scores_rm)))
-z0 <- (mean(scores_rm$home.score)-3)/(sd(medias$promedio)/sqrt(nrow(medias)))
-z.05 <- qnorm(p = 0.05, lower.tail = FALSE)
-pvalue <- pnorm(z0, lower.tail = FALSE)
-
-z0
-z.05
-pvalue
 
 
 
-# Prueba de hipótesis
-# H0 goles = 3    Hipótesis Nula el equipo anota 3 goles
-# H1 goles > 3    Hipótesis Alterna el equipo anota más de 3 goles
-scores_rm = filter(scores, home.team == "Real Madrid")
+######################## Teorema central de limite #############################
 
-# Calculamos la frecuencia de número de goles como local
-frecuencias <-  as.data.frame(table(scores_rm$home.score))
+scores_rm = filter(scores, home.team == "Real Madrid")                          #Escogemos un equipo de nuestro conjunto
 
-# Se gráfica esa frecuencia
-plot(frecuencias$Var1, frecuencias$Freq, type = "l", xlab="Número de goles", ylab="Frecuencia")
-# Se observa una distribución asimetrica por la derecha
+(frecuencias <-  as.data.frame(table(scores_rm$home.score)))                    #Calculamos la frecuencia de número de goles como local
+
+ggplot(frecuencias, aes(x=Var1, y=Freq))+                                       # Se gráfica esa frecuencia
+  geom_col(color='white',fill='deepskyblue4')+
+  labs(x = "Goles", 
+       y = "Frecuencia",
+       title = "Goles anotados por Real Madrid",
+       subtitle= "Jugando como local") +
+  theme(plot.title = element_text(size=22)) +
+  dark_theme_gray()
+
+# Se observa una distribución asimétrica por la derecha
 # Entonces aplicaremos el teorema del límite central
 
 library(data.table)
-# Generar 100 muestras de 40 registros
+
 muestras <- c()
-for(i in 1:100){
+for(i in 1:100){                                                                # Generar 100 muestras de 40 registros
   tmp <- sample(scores_rm$home.score, size = 40)
   tmp <- as.data.table(tmp)
   tmp[, grupo := i] 
@@ -313,49 +265,65 @@ for(i in 1:100){
   muestras <- rbindlist(l) 
 }
 
-# Objeto tipo tabla con la media de cada muestra
-medias <- muestras[, mean(tmp), by = grupo]
-setnames(medias, "V1", "promedio")
-promedio_muestras <- mean(medias$promedio)
+medias <- muestras[, mean(tmp), by = grupo]                                     # Objeto tipo tabla con la media de cada muestra
+setnames(medias, "V1", "promedio"); medias
 
-# Gráfica de la distribución de las medias de las muestras
+(promedio_muestras <- mean(medias$promedio))                                    # Promedio de las medias de las muestras
+
+
 d <- density(medias$promedio, adjust = 1.8)
-plot(d, main = "Densidad de los goles como local")
-polygon(d, col="cadetblue1", border = "white")
-lines(d, col ="#000000", lwd = 3)
+
+ggplot(data.frame(x = d$x, y = d$y),aes(x, y)) +                                # Gráfica de la distribución de las medias de las muestras
+  geom_line(colour = "white", size = 2) + 
+  geom_area(fill = "cadetblue") +
+  labs(y = "Densidad",
+       title = "Densidad de los promedios de goles como local")+
+  theme(plot.title = element_text(size=22)) +
+  dark_theme_gray()
 
 #Con esto ya se aproxima a una distribución normal y podemos hacer una prueba de hipótesis
-# Siguiendo la explicación de https://app.bedu.org/course/21434/module/202/session/1397/content/3675/part/5831
-# Formula del (z0 <- (mean(muestra)-media_de_prueba)/(sd(muestra)/sqrt(tamaño_de_muestra)))
-#z0 <- (mean(scores_rm$home.score)-3)/(sd(scores_rm$home.score)/sqrt(nrow(scores_rm)))
-prom <- mean(scores_rm$home.score)
-desv <- sd(scores_rm$home.score)
-z0 <- (mean(scores_rm$home.score)-3)/(sd(medias$promedio)/sqrt(nrow(medias)))
-z.05 <- qnorm(p = 0.05, mean=prom, sd=desv lower.tail = FALSE)
-pvalue <- pnorm(z0, lower.tail = FALSE)
 
-z0
-z.05
-pvalue
 
-# Como z0 < z.05 se acepta H0
+############################## Prueba de hipótesis #############################
 
-# 2a Prueba de hipótesis
-# H0 goles = 2    Hipótesis Nula el equipo anota 3 goles
-# H1 goles > 2    Hipótesis Alterna el equipo anota más de 3 goles
-z0 <- (prom-2)/(sd(medias$promedio)/sqrt(nrow(medias)))
-z.05 <- qnorm(p = 0.05, mean=prom, sd=desv lower.tail = FALSE)
-pvalue <- pnorm(z0, lower.tail = FALSE)
-z0
-z.05
-pvalue
-# Como z0 > z.05 se rechaza H0 y se aceptá H1
-# Entonces se puede afirmar con una confianza del 95% que el Real Madrid anotará más de dos goles jugando como local
+m_scores_rm <- sample(scores_rm$home.score, 40)                                 #Extraemos un subconjunto de nuestra población
 
-x <- seq(0, 6, 0.1)
-y <- dnorm(x, mean(scores_rm$home.score))
-plot(x, y, type = "l", xlab="", ylab="")
-title(main = "Densidad normal estándar", sub = expression(paste(mu == 0, " y ", sigma == 1)))
-polygon(c(z.05, x[x>=z.05], max(x)), c(0, y[x>=z.05], 0), col="red")
-axis(side = 1, at = z.05, font = 2, padj = 1, lwd = 2)
-text(-3, 0.05, labels = expression(alpha == 0.05), col = "red")
+# Nos interesa saber si en promedio el numero de goles que anota el Real Madrid
+# cuando juega como local es mayor a 2
+
+# Prueba de cola superior
+# H0 goles <= 2    Hipótesis Nula el equipo 2 o menos goles
+# H1 goles > 2    Hipótesis Alterna el equipo anota más de 2 goles
+
+prom <- mean(m_scores_rm)                                                       # Promedio
+desv <- sd(m_scores_rm)                                                         # Desviación estándar
+n <- length(m_scores_rm)                                                        # Tamaño de muestra
+
+#(z0 <- (mean(muestra)-media_de_prueba)/(sd(muestra)/sqrt(tamaño_de_muestra)))  # Estadístico de prueba
+(z0 <- (prom-2)/(desv/sqrt(n)))
+
+(z.05 <- qnorm(p = 0.05,  lower.tail = FALSE))                                  # Valor critico para identificar zona de rechazo a 95% de confianza
+
+(pvalue <- pnorm(z0, lower.tail = FALSE))                                       # Calculo de P value
+
+t.test(x=m_scores_rm, alternative = 'greater', mu=2)                            # Comprobamos con la prueba t test de forma directa
+
+x <- seq(-4, 4, 0.1)
+y <- dnorm(x)
+
+ggplot(data.frame(x,y),aes(x, y)) +                                             #Graficamos nuestra zona de rechazo
+  stat_function(fun=dnorm, geom="line", col = "white")+
+  geom_ribbon(data=subset(data.frame(x,y) ,x>=z.05 & x<4),aes(ymax=y),ymin=0,
+              fill="brown3", colour=NA)+
+  geom_text(label=round(z.05,5), x=z.05, y=0, color = "white")+
+  geom_label(label="Zona de rechazo", x=3.5, y=0.2, 
+             label.padding = unit(0.55, "lines"), fill = "brown3", alpha = 0.2)+
+  labs(y = "Densidad",
+       title = "Densidad normal estándar")+
+  theme(plot.title = element_text(size=22)) +
+  dark_theme_gray()
+
+# Como nuestro estadístico de prueba se encuentra en zona de rechazo,
+# existe evidencia estadística necesaria para rechazar la hipótesis nula.
+# Entonces se puede afirmar con una confianza del 95% que el Real Madrid anotará MÁS DE DOS GOLES jugando como local.
+
