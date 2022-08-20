@@ -376,3 +376,4 @@ title(main = "Densidad normal estándar", sub = expression(paste(mu == 0, " y ",
 polygon(c(z.05, x[x>=z.05], max(x)), c(0, y[x>=z.05], 0), col="red")
 axis(side = 1, at = z.05, font = 2, padj = 1, lwd = 2)
 text(-3, 0.05, labels = expression(alpha == 0.05), col = "red")
+
