@@ -1,3 +1,11 @@
+
+# Descárgalo del CRAN https://cran.r-project.org/src/contrib/Archive/fbRanks/fbRanks_2.0.tar.gz
+# Instala igraphs install.packages("igraph")
+# install.packages(path_absoluta_del_archivo, repos = NULL, type = "source")
+
+install.packages("igraph")
+install.packages("C:/Users/Mateo/Downloads/Bedu Fase2/Proyecto/fbRanks_2.0.tar.gz", repos = NULL, type = "source")
+
 library(fbRanks)
 library(dplyr)
 library(ggplot2)
@@ -6,7 +14,8 @@ library(ggplot2)
 
 # Colocar el directorio de trabajo según corresponda
 
-setwd("C:/Users/User/Documents/Bedu/Sesion 8/post/")
+# setwd("C:/Users/User/Documents/Bedu/Sesion 8/post/")
+setwd("C:/Users/Mateo/Downloads/Bedu Fase2/Proyecto/")
 
 # Descarga de archivos
 # https://www.football-data.co.uk/spainm.php
@@ -348,7 +357,7 @@ lines(d, col ="#000000", lwd = 3)
 prom <- mean(scores_rm$home.score)
 desv <- sd(scores_rm$home.score)
 z0 <- (mean(scores_rm$home.score)-3)/(sd(medias$promedio)/sqrt(nrow(medias)))
-z.05 <- qnorm(p = 0.05, mean=prom, sd=desv lower.tail = FALSE)
+z.05 <- qnorm(p = 0.05, mean=prom, sd=desv, lower.tail = FALSE)
 pvalue <- pnorm(z0, lower.tail = FALSE)
 
 z0
@@ -357,11 +366,19 @@ pvalue
 
 # Como z0 < z.05 se acepta H0
 
+x <- seq(0, 6, 0.1)
+y <- dnorm(x, mean(scores_rm$home.score))
+plot(x, y, type = "l", xlab="", ylab="")
+title(main = "Densidad normal estándar", sub = expression(paste(mu == 0, " y ", sigma == 1)))
+polygon(c(z.05, x[x>=z.05], max(x)), c(0, y[x>=z.05], 0), col="red")
+axis(side = 1, at = z.05, font = 2, padj = 1, lwd = 2)
+text(-3, 0.05, labels = expression(alpha == 0.05), col = "red")
+
 # 2a Prueba de hipótesis
 # H0 goles = 2    Hipótesis Nula el equipo anota 3 goles
 # H1 goles > 2    Hipótesis Alterna el equipo anota más de 3 goles
 z0 <- (prom-2)/(sd(medias$promedio)/sqrt(nrow(medias)))
-z.05 <- qnorm(p = 0.05, mean=prom, sd=desv lower.tail = FALSE)
+z.05 <- qnorm(p = 0.05, mean=prom, sd=desv, lower.tail = FALSE)
 pvalue <- pnorm(z0, lower.tail = FALSE)
 z0
 z.05
@@ -376,6 +393,4 @@ title(main = "Densidad normal estándar", sub = expression(paste(mu == 0, " y ",
 polygon(c(z.05, x[x>=z.05], max(x)), c(0, y[x>=z.05], 0), col="red")
 axis(side = 1, at = z.05, font = 2, padj = 1, lwd = 2)
 text(-3, 0.05, labels = expression(alpha == 0.05), col = "red")
-
-
 
