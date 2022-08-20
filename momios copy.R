@@ -798,16 +798,14 @@ prob_total <- dplyr::rename(prob_total, Mas_de_0_goles = prob, Mas_de_1_gol = pr
                             Mas_de_5_goles= prob.5, Mas_de_6_goles= prob.6, Mas_de_7_goles = prob.7,
                             Mas_de_8_goles= prob.8, Mas_de_9_goles= prob.9, Mas_de_10_goles= prob.10)
 
-
-
-
-#Su población no tiene más de 40 datos
-cor<-subset(visitante, away.team =="Cordoba")
-elc<-subset(visitante, away.team =="Elche")
-gir<-subset(visitante, away.team =="Girona")
-hue<-subset(visitante, away.team =="Huesca")
-
-
-
-
-
+names<-data.frame( "Alaves", "Almeria", "Ath_Bilbao", "Ath_Madrid",             
+            "Barcelona", "Betis", "Celta", "Eibar", "Espanol", "Getafe",
+            "Granada", "Coruna", "Palmas", "Leganes", "Levante",
+            "Malaga", "Mallorca", "Osasuna", "Real_Madrid",
+            "Sevilla", "Sociedad", "Sp_Gijon", "Valencia",
+            "Valladolid", "Vallecano", "Villarreal")
+names<-t(names)
+names<-as.data.frame(names)
+prob_total<- cbind(names,prob_total)
+prob_total <- dplyr::rename(prob_total, Equipos_visitantes=V1)
+write.csv(prob_total, "Probabilidades.csv", row.names = FALSE) 
