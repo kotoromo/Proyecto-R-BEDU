@@ -375,5 +375,5 @@ ggplot(data.frame(x,y),aes(x, y)) +                                             
 
 # Como nuestro estadístico de prueba se encuentra en zona de rechazo, pues z0 = -11.54 < z.05 = -1.64
 # existe evidencia estadística necesaria para rechazar la hipótesis nula.
-# Entonces se puede afirmar con una confianza del 95% que el equipo local anotará MENOS DE DOS GOLES jugando como local.
+# Entonces se puede afirmar con una confianza del 95% que el equipo visitante anotará MENOS DE DOS GOLES jugando contra el Real Madrid como local.
 
