@@ -12,7 +12,7 @@ ui <- navbarPage("Equipo 8",
                                       choices = c("Local", "Visitante")),
                           plotOutput("plot", height = 800, width = 900),
                           br(),
-                          p("Mostramos los histogramas de los equipos cuando juegan como locales y visitantes en sus respectivas vistas En general, podemos observar de los histogramas un fuerte sesgo hacia la derecha. La distribución de los goles no es simétrica excepto en contadas ocasiones de acuerdo con los histogramas.")
+                          p("Mostramos los histogramas de los equipos cuando juegan como locales y visitantes en sus respectivas vistas. En general, podemos observar de los histogramas un fuerte sesgo hacia la derecha. La distribución de los goles no es simétrica excepto en contadas ocasiones de acuerdo con los histogramas.")
                  ),
                  #Página 2
                  tabPanel("Probabilidades marginales", icon = icon("chart-area"),
@@ -84,6 +84,7 @@ server <- function(input, output) {
   df2 <- create.fbRanks.dataframes(scores.file = "https://raw.githubusercontent.com/kotoromo/Proyecto-R-BEDU/main/match.data.csv")
   scores <- df2$scores
   
+  #Output Página 1
   output$plot <- renderPlot({
     
     if (is.null(input$x))
@@ -107,11 +108,9 @@ server <- function(input, output) {
         ylim(0,50) + dark_theme_gray()
     }
     
-    
-    
   })
 
-  
+  #Output Página 2
   output$image1 <- renderImage({
     
     if (is.null(input$y))
@@ -139,17 +138,16 @@ server <- function(input, output) {
       ))
     }
   
-  
   })
 
-  
+  #Output Página 3
   output$data_table <- renderDataTable( {
     datos<-read.csv("https://raw.githubusercontent.com/kotoromo/Proyecto-R-BEDU/main/match.data.csv")
     }, 
-    options = list(aLengthMenu = c(5,10,15), iDisplayLength = 5)
+    options = list(aLengthMenu = c(10,15,20), iDisplayLength = 10)
   )
 
-  
+  #Output Página 4
   output$image2 <- renderImage({
     
     if (is.null(input$z))
@@ -171,9 +169,10 @@ server <- function(input, output) {
     
   })
   
+  #Output Página 5
   output$plot2 <- renderPlot({
     
-    output$output_1 <- renderText(paste("Nos interesa saber si en promedio el numero de goles que anota " 
+    output$output_1 <- renderText(paste("Nos interesa saber si en promedio el número de goles que anota " 
                                         , input$t, " cuando juega como local es mayor a 2."))
     scores_team = filter(scores, home.team == input$t)
     m_scores_team <- sample(scores_team$home.score, 40)
@@ -193,7 +192,7 @@ server <- function(input, output) {
     
     if(z0 > z.05){
       output$output_resultado <- renderText(paste(
-        "Como nuestro estadístico de prueba se encuentra en zona de rechazo (estadistico de prueba > valor critico), 
+        "Como nuestro estadístico de prueba se encuentra en zona de rechazo (estadístico de prueba > valor critico), 
          existe evidencia estadística necesaria para rechazar la hipótesis nula.
          Entonces se puede afirmar con una confianza del 95% que", input$t, 
          "anotará en promedio MÁS DE DOS GOLES jugando como local."
@@ -222,9 +221,9 @@ server <- function(input, output) {
       theme(plot.title = element_text(size=22)) +
       dark_theme_gray()
     
-    
   })
   
+  #Output Página 6
   output$data_table2 <- renderDataTable( {
     datos<-read.csv("www/Probabilidades.csv")
   }, 
